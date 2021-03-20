@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0 , user-scalable=no"
+        />
+        <title>canvas手势解锁</title>
+        <link rel="stylesheet" href="./reset.css" />
+        <style>
+            .container {
+                position: absolute;
+                overflow: hidden;
+            }
+            @media screen and (max-width: 750px) {
+                .container {
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background-color: #305066;
+                }
+            }
+            @media screen and (min-width: 750px) {
+                .container{
+                    left: 50%;
+                    transform: translate(-50%);
+                    width: 50vw;
+                    height: 100%;
+                    background-color: #305066;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div id="canvas"></div>
+        </div>
+        <script src="./index.js"></script>
+        <script>
+            // 1.设置画布的宽高
+            // 2.设置画布的背景色
+            // 3.生成 9 个圆圈
+            // 4.生成标题
+            /*
+            * 实现三次解锁，之后就不允许解锁
+            * */
+            let seconds = [5,30,5*60,12*60*60]; // 解锁时间组件增多
+            let index = 0;
+            const lock = new CanvasLock(
+                document.querySelector('#canvas'),
+                {
+                  num: 3,
+                  validate: function(res) {
+                      if(res.join('') == "45876"){
+                          return true;
+                      }
+                      return false;
+                  },
+                  success: function(){
+                      return "解锁成功";
+                  },
+                  error: function(res,unlockTimes) {
+                      if(unlockTimes == 3){
+                          // "30秒后再来" , false , 2
+                          // return ["2秒后再来" , false , 2]
+                          return {
+                              title: '{seconds}秒后才来',
+                              seconds: seconds[index++]
+                          }
+                      }else{
+                          // return [`还有${3 - unlockTimes}次机会`,true , 0];
+                          return {
+                              title: `还有${3 - unlockTimes}次机会`
+                          }
+                      }
+                  }
+                },
+            );
+            lock.init();
+        </script>
+    </body>
+</html>
